@@ -2,10 +2,10 @@ from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-from .role import Role
-from .user import User
-from .student import Student
-from .instructor import Instructor
-from .course import Course
-from .course_enrollment import CourseEnrollment
-from .grade import Grade
+from .role_model import Role
+from .user_model import User
+from .student_model import Student
+from .instructor_model import Instructor
+from .course_model import Course
+from .course_enrollment_model import CourseEnrollment
+from .grade_model import Grade
