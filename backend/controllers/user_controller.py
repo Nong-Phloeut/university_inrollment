@@ -1,20 +1,9 @@
-from models.user_model import UserModel
+from sqlalchemy.orm import Session
+from services.user_service import fetch_all_users, create_user
+from schemas.user_schema import UserCreate
 
-class UserController:
-    def __init__(self):
-        self.user_model = UserModel()
+def get_all_users(db: Session):
+    return fetch_all_users(db)
 
-    def get_all_users(self):
-        return self.user_model.get_all_users()
-
-    def get_user_by_id(self, user_id):
-        return self.user_model.get_user_by_id(user_id)
-
-    def create_user(self, first_name, last_name, email, password, role_id):
-        return self.user_model.create_user(first_name, last_name, email, password, role_id)
-
-    def update_user(self, user_id, **kwargs):
-        return self.user_model.update_user(user_id, **kwargs)
-
-    def delete_user(self, user_id):
-        return self.user_model.delete_user(user_id)
+def add_user(db: Session, user_data: UserCreate):
+    return create_user(db, user_data)

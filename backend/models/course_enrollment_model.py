@@ -1,77 +1,23 @@
-from core.database import get_connection
+from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, CheckConstraint
+from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from . import Base
 
-class CourseEnrollmentModel:
-    def get_all_enrollments(self):
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("""
-                    SELECT
-                        ce.id,
-                        ce.student_id,
-                        ce.course_id,
-                        ce.semester,
-                        ce.academic_year,
-                        ce.status,
-                        ce.enrolled_at,
-                        c.code,
-                        c.title AS course_title,
-                        CONCAT(u.first_name, ' ', u.last_name) AS student_name,
-                        g.grade
-                    FROM course_enrollments ce
-                    JOIN students s ON ce.student_id = s.id
-                    JOIN users u ON s.id = u.id
-                    JOIN courses c ON ce.course_id = c.id
-                    LEFT JOIN grades g ON g.enrollment_id = ce.id
-                    ORDER BY ce.id
-                """)
-                return cursor.fetchall()
+class CourseEnrollment(Base):
+    __tablename__ = "course_enrollments"
 
-    def get_enrollment_by_id(self, enrollment_id):
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("""
-                    SELECT
-                        ce.id,
-                        ce.student_id,
-                        ce.course_id,
-                        ce.semester,
-                        ce.academic_year,
-                        ce.status,
-                        ce.enrolled_at,
-                        u.first_name,
-                        u.last_name,
-                        c.code,
-                        c.title AS course_title,
-                    FROM course_enrollments ce
-                    JOIN students s ON ce.student_id = s.id
-                    JOIN users u ON s.id = u.id
-                    JOIN courses c ON ce.course_id = c.id
-                    WHERE ce.id = %s
-                """, (enrollment_id,))
-                return cursor.fetchone()
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
+    course_id = Column(Integer, ForeignKey("courses.id", ondelete="CASCADE"), nullable=False)
+    semester = Column(String(20), nullable=False)
+    academic_year = Column(String(9), nullable=False)
+    status = Column(String(20), default="active")
+    enrolled_at = Column(TIMESTAMP, server_default=func.now())
 
-    def create_enrollment(self, student_id, course_id, semester, academic_year, status, enrolled_at, grade=None):
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("""
-                    INSERT INTO course_enrollments (
-                        student_id, course_id, semester, academic_year, status, enrolled_at
-                    ) VALUES (%s, %s, %s, %s, %s, %s)
-                    RETURNING id
-                """, (student_id, course_id, semester, academic_year, status, enrolled_at))
-                enrollment_id = cursor.fetchone()["id"]
+    student = relationship("Student", back_populates="enrollments")
+    course = relationship("Course", back_populates="enrollments")
+    grade = relationship("Grade", uselist=False, back_populates="enrollment")
 
-                if grade:
-                    cursor.execute("""
-                        INSERT INTO grades (enrollment_id, grade)
-                        VALUES (%s, %s)
-                    """, (enrollment_id, grade))
-                conn.commit()
-                return enrollment_id
-
-
-    def delete_enrollment(self, enrollment_id):
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("DELETE FROM course_enrollments WHERE id = %s", (enrollment_id,))
-                conn.commit()
+    __table_args__ = (
+        CheckConstraint("status IN ('active', 'completed', 'dropped')", name="status_check"),
+    )

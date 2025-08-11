@@ -20,13 +20,10 @@ CREATE TABLE students (
     student_number VARCHAR(50) UNIQUE NOT NULL,
     dob DATE,
     gender VARCHAR(10) CHECK (gender IN ('Male', 'Female', 'Other')),
-    address TEXT,
     phone_number VARCHAR(20),
     enrollment_date DATE,
     major VARCHAR(100),
     status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'On Leave', 'Graduated', 'Suspended')),
-    emergency_contact_name VARCHAR(255),
-    emergency_contact_phone VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -35,9 +32,6 @@ CREATE TABLE students (
 CREATE TABLE instructors (
     id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     employee_number VARCHAR(50) UNIQUE NOT NULL,
-    department VARCHAR(100),
-    phone_number VARCHAR(20),
-    hire_date DATE,
     job_title VARCHAR(100),
     status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'On Leave', 'Retired')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
