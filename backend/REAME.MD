@@ -25,5 +25,9 @@ add your username and password
 # STEP 6: Initialize database tables
 python run.py  # First run will auto-create tables
 
-# STEP 7: Launch the application
-python run.py
+# STEP 7: Seeder data
+python run.py  # First run will auto-create tables
+
+# STEP 8: Launch the application
+uvicorn main:app --reload
+

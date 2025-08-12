@@ -2,10 +2,11 @@
 from pydantic import BaseModel, EmailStr
 
 class UserBase(BaseModel):
-    username: str
+    first_name: str
+    last_name: str
     email: str
     password: str
-    role_id: str
+    role_id: int
 
 class UserCreate(UserBase):
     password: str

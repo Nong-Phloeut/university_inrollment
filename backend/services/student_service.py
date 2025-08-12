@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session
-from models import User
-from schemas.user_schema import UserCreate
+from models import Student
+from schemas.student_schema import StudentCreate
 
-def fetch_all_users(db: Session):
-    return db.query(User).all()
+def fetch_all_students(db: Session):
+    return db.query(Student).all()
 
-def create_user(db: Session, user_data: UserCreate):
-    user = User(
+def create_user(db: Session, user_data: StudentCreate):
+    user = Student(
         first_name=user_data.first_name,
         last_name=user_data.last_name,
         email=user_data.email,

@@ -1,18 +1,19 @@
 import os
 from dotenv import load_dotenv
-import psycopg2
-from psycopg2 import Error as Psycopg2Error
-import psycopg2
+import pymysql
+import sqlparse
 
 # Load environment variables from .env
 load_dotenv()
 
 DB_CONFIG = {
     'host': os.getenv('DB_HOST'),
-    'port': int(os.getenv('DB_PORT', 5432)),
-    'dbname': os.getenv('DB_NAME'),
+    'port': int(os.getenv('DB_PORT', 3306)),
+    'db': os.getenv('DB_NAME'),
     'user': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASSWORD')
+    'password': os.getenv('DB_PASSWORD'),
+    'charset': 'utf8mb4',
+    'cursorclass': pymysql.cursors.DictCursor
 }
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -22,14 +23,14 @@ def run_seeders():
     conn = None
     cursor = None
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
 
-        # Create seed_history table to track applied seed files
+        # Create seed_history table (MySQL compatible)
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS seed_history (
-                filename TEXT PRIMARY KEY,
-                applied_at TIMESTAMPTZ DEFAULT now()
+                filename VARCHAR(255) PRIMARY KEY,
+                applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
         conn.commit()
@@ -62,7 +63,7 @@ def run_seeders():
 
                 print(f"Seeding {filename}...")
 
-                # Split SQL file into individual statements (handles multiple statements)
+                # Split SQL file into individual statements
                 statements = sqlparse.split(sql)
 
                 for statement in statements:
@@ -73,7 +74,7 @@ def run_seeders():
                 conn.commit()
                 print(f"✅ Successfully seeded {filename}.")
 
-            except Psycopg2Error as e:
+            except pymysql.MySQLError as e:
                 conn.rollback()
                 print(f"ERROR seeding {filename}: {e}")
                 print(f"SQL that caused the error (first 200 chars):\n{statement[:200]}...")
@@ -83,7 +84,7 @@ def run_seeders():
 
         print("🌱 All seeding completed.")
 
-    except Psycopg2Error as e:
+    except pymysql.MySQLError as e:
         print(f"Database connection or setup error: {e}")
     except Exception as e:
         print(f"Unexpected error during seeding: {e}")

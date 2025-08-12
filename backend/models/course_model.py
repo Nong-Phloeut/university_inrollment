@@ -9,7 +9,6 @@ class Course(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     code = Column(String(20), nullable=False, unique=True)  # e.g., MATH101
     title = Column(String(255), nullable=False)
-    credits = Column(Integer, default=3)
     instructor_id = Column(Integer, ForeignKey("instructors.id", ondelete="SET NULL"))
     term = Column(String(50))
     year = Column(Integer)
