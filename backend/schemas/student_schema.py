@@ -1,14 +1,15 @@
 # schemas/user_schema.py
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
 
 class StudentBase(BaseModel):
     student_number: str
-    dob: str
+    dob: datetime
     gender: str
     phone_number: str
-    enrollment_date: int
-    major: int
-    status: int
+    enrollment_date: datetime
+    major: str
+    status: str
 
 class StudentCreate(StudentBase):
     password: str
