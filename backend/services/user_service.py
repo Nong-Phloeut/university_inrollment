@@ -17,3 +17,9 @@ def create_user(db: Session, user_data: UserCreate):
     db.commit()
     db.refresh(user)
     return user
+
+
+def fetch_users_by_role(db: Session, role_id: int):
+    return db.query(User).filter(User.role_id == role_id).all()
+
+

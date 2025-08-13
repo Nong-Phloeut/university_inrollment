@@ -1,20 +1,21 @@
-from models.course_model import CourseModel
+from sqlalchemy.orm import Session
+from services.course_service import fetch_all_courses, create_course, get_course_by_id, edit_course, delete_course_by_Id
+from schemas.course_schema import CourseCreate, UserRead, CourseUpdate
 
-class CourseController:
-    def __init__(self):
-        self.course_model = CourseModel()
 
-    def get_all_courses(self):
-        return self.course_model.get_all_courses()
+def get_all_courses(db: Session):
+    return fetch_all_courses(db)
 
-    def get_course_by_id(self, course_id):
-        return self.course_model.get_course_by_id(course_id)
+def add_course(db: Session, user_data: CourseCreate):
+    return create_course(db, user_data)
 
-    def create_course(self, code, title, **kwargs):
-        return self.course_model.create_course(code, title, **kwargs)
+def fetc_course_by_id(db: Session, course_id: int):
+    return get_course_by_id(db, course_id)
 
-    def update_course(self, course_id, **kwargs):
-        return self.course_model.update_course(course_id, **kwargs)
+def update_course(db: Session, course_id: int, update_data: CourseUpdate):
+    """Update an existing course by ID"""
+    return edit_course(db, course_id, update_data)
 
-    def delete_course(self, course_id):
-        return self.course_model.delete_course(course_id)
+def delete_course(db: Session, course_id: int):
+    """Delete a course by ID"""
+    return delete_course_by_Id(db, course_id)

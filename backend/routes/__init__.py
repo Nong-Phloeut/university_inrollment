@@ -1,3 +1,6 @@
 from . import user_routes
 from . import student_routes
 from . import dashboard_routes
+from . import grade_routes
+from . import course_routes
+from . import transcript_routes
