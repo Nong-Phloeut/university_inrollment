@@ -1,14 +1,9 @@
-from models.dashboard_model import DashboardModel
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from database import get_db
+from services.dashboard_service import get_dashboard_data_service
+from schemas.dashboard_schema import DashboardResponse
 
-class DashboardController:
-    def __init__(self):
-        self.model = DashboardModel()
-
-    def get_user_count_by_role(self, role_name: str) -> int:
-        return self.model.get_user_count_by_role(role_name)
-
-    def get_courses_count(self) -> int:
-        return self.model.get_courses_count()
-
-    def get_enrollments_count(self) -> int:
-        return self.model.get_enrollments_count()
+def get_dashboard_data_controller(db: Session = Depends(get_db)) -> DashboardResponse:
+    data = get_dashboard_data_service(db)
+    return DashboardResponse(**data)
